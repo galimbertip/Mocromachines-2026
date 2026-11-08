@@ -3,6 +3,22 @@
   Micro Rush — GPverse
   Cronologia versioni (schema V.major.minor.patch)
 
+  v1.1.0 — 8 novembre 2026 (leggibilità e accessibilità)
+    - Telecamera che guarda avanti nella direzione di marcia e si allarga
+      un poco ad alta velocità, per vedere prima le curve.
+    - Cartelli a chevron sul bordo esterno delle curve strette e avviso
+      "copilota" in alto (‹‹ SINISTRA / DESTRA ››) prima di ogni curva,
+      con più frecce se la curva è più stretta.
+    - Tre livelli di difficoltà: Facile, Normale, Difficile.
+    - Aiuto alla guida opzionale: più aderenza e frenata automatica se
+      arrivi troppo forte in curva.
+    - Sterzo touch analogico: tieni premuto e trascina il pollice; i
+      tasti ◀ ▶ restano disponibili come alternativa.
+    - Tasti touch più grandi e opzione per mancini (comandi invertiti).
+    - Rientro automatico in pista dopo 3 secondi fuori pista o fermi.
+    - Riavvio istantaneo: tasto R o pulsante ↻.
+    - Mini tutorial alla prima partita.
+
   v1.0.0 — 7 novembre 2026
     - Prima versione: corse in miniatura viste dall'alto, ispirate ai
       classici per PC degli anni '90 e rifatte in chiave 2026.
@@ -44,10 +60,23 @@ canvas#c,canvas#hud{position:fixed;left:0;top:0;display:block;touch-action:none}
 body.nofx .tilt{display:none}
 #touch{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;justify-content:space-between;align-items:flex-end;padding:0 16px calc(16px + env(safe-area-inset-bottom,0px));pointer-events:none}
 #touch .tg{display:flex;gap:14px;align-items:flex-end}
-#touch button{pointer-events:auto;touch-action:none;border:1.5px solid rgba(255,255,255,.28);background:rgba(8,12,24,.38);color:#fff;font:700 22px 'Space Grotesk',sans-serif;border-radius:50%;width:78px;height:78px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);padding:0}
+#touch button{pointer-events:auto;touch-action:none;border:1.5px solid rgba(255,255,255,.28);background:rgba(8,12,24,.38);color:#fff;font:700 24px 'Space Grotesk',sans-serif;border-radius:50%;width:86px;height:86px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);padding:0}
 #touch button.on{background:rgba(94,234,245,.38);border-color:var(--cy)}
-#touch .gas{width:94px;height:94px;font-size:16px;letter-spacing:.06em}
-#touch .brk{width:64px;height:64px;font-size:12px;letter-spacing:.04em}
+#touch .gas{width:104px;height:104px;font-size:16px;letter-spacing:.06em}
+#touch .brk{width:76px;height:76px;font-size:13px;letter-spacing:.04em}
+#touch.swap{flex-direction:row-reverse}
+#touch.drag .tg.steer{visibility:hidden}
+#steerZone{position:fixed;left:0;top:18%;bottom:0;width:50%;z-index:5;touch-action:none;display:none}
+#touch.drag ~ #steerZone{display:block}
+body.swap #steerZone{left:auto;right:0}
+#knob{position:fixed;z-index:6;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;border:2px solid rgba(94,234,245,.45);background:rgba(8,12,24,.25);pointer-events:none;display:none}
+#knob i{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(94,234,245,.55)}
+#restartBtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:62px;z-index:7;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(8,12,24,.6);color:#fff;font:700 18px 'Space Grotesk',sans-serif;cursor:pointer}
+.seg.three{grid-template-columns:repeat(3,1fr)}
+.seg.three button{text-align:center;padding:10px 4px;font-size:14px;font-weight:600}
+.optrow{padding:9px 0;border-top:1px solid var(--line)}
+.optrow>span{display:block;font-size:14.5px;margin-bottom:8px}
+.tut li{margin:6px 0}
 .hidden{display:none!important}
 #pauseBtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:10px;z-index:7;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(8,12,24,.6);color:#fff;font:700 15px 'Space Grotesk',sans-serif;cursor:pointer}
 .overlay{position:fixed;inset:0;z-index:10;overflow-y:auto;-webkit-overflow-scrolling:touch;background:radial-gradient(1200px 600px at 20% -10%,rgba(94,234,245,.14),transparent 60%),radial-gradient(900px 500px at 110% 10%,rgba(164,92,255,.16),transparent 60%),var(--bg)}
@@ -117,9 +146,11 @@ table.res td.t{text-align:right;font-variant-numeric:tabular-nums}
 <canvas id="hud"></canvas>
 
 <div id="touch" class="hidden">
-  <div class="tg"><button data-k="left" aria-label="Sinistra">◀</button><button data-k="right" aria-label="Destra">▶</button></div>
+  <div class="tg steer"><button data-k="left" aria-label="Sinistra">◀</button><button data-k="right" aria-label="Destra">▶</button></div>
   <div class="tg"><button data-k="brake" class="brk">FRENO</button><button data-k="gas" class="gas">GAS</button></div>
 </div>
+<div id="steerZone"></div><div id="knob"><i></i></div>
+<button id="restartBtn" class="hidden" aria-label="Ricomincia">↻</button>
 <button id="pauseBtn" class="hidden" aria-label="Pausa">❚❚</button>
 
 <div id="menu" class="overlay">
@@ -152,6 +183,12 @@ table.res td.t{text-align:right;font-variant-numeric:tabular-nums}
     <section class="card"><h2>Pista</h2><div class="tracks" id="tracks"></div></section>
     <section class="card">
       <h2>Opzioni</h2>
+      <div class="optrow" style="border-top:0;padding-top:0"><span>Difficoltà</span>
+        <div class="seg three" id="segDiff"><button data-v="facile">Facile</button><button data-v="normale" class="on">Normale</button><button data-v="difficile">Difficile</button></div></div>
+      <div class="optrow"><span>Sterzo touch</span>
+        <div class="seg three" id="segSteer" style="grid-template-columns:1fr 1fr"><button data-v="drag" class="on">Trascina il pollice</button><button data-v="buttons">Tasti ◀ ▶</button></div></div>
+      <label class="opt" style="border-top:1px solid var(--line)"><span>Aiuto alla guida</span><input type="checkbox" id="optAssist"><i></i></label>
+      <label class="opt"><span>Comandi per mancini (touch invertito)</span><input type="checkbox" id="optSwap"><i></i></label>
       <label class="opt"><span>Effetto miniatura (tilt-shift)</span><input type="checkbox" id="optFx"><i></i></label>
       <label class="opt"><span>Audio</span><input type="checkbox" id="optAudio"><i></i></label>
       <label class="opt"><span>Gas automatico (touch)</span><input type="checkbox" id="optAuto"><i></i></label>
@@ -163,14 +200,16 @@ table.res td.t{text-align:right;font-variant-numeric:tabular-nums}
         <li><b>Giocatore 1:</b> frecce (in single player vanno bene anche W A S D)</li>
         <li><b>Giocatore 2:</b> W A S D</li>
         <li><b>Gamepad:</b> stick o croce per sterzare, A / RT gas, B / LT freno, Start pausa. Il primo gamepad è P1, il secondo è P2.</li>
-        <li><b>Touch:</b> ◀ ▶ a sinistra, GAS e FRENO a destra. Con il gas automatico acceleri sempre e premi solo FRENO.</li>
-        <li><b>Pausa:</b> P oppure Esc</li>
+        <li><b>Touch:</b> tieni premuto su metà schermo e trascina il pollice per sterzare (oppure i tasti ◀ ▶), FRENO e GAS dall'altra parte. Con il gas automatico acceleri sempre e premi solo FRENO.</li>
+        <li><b>Pausa:</b> P oppure Esc · <b>Ricomincia:</b> R oppure ↻</li>
+        <li><b>Copilota:</b> in alto compare la prossima curva (‹‹ SINISTRA / DESTRA ››), più frecce = curva più stretta.</li>
         <li><b>Consiglio:</b> le pozze (latte, inchiostro, acqua) fanno scivolare, fuori pista si rallenta.</li>
       </ul>
     </details>
     <details class="card">
       <summary id="newsTitle">Novità</summary>
       <ul>
+        <li><b>v1.1.0</b> · leggibilità e accessibilità: telecamera che guarda avanti, cartelli e avviso copilota sulle curve, tre livelli di difficoltà, aiuto alla guida, sterzo touch trascinando il pollice, comandi per mancini, rientro automatico in pista, riavvio istantaneo, mini tutorial.</li>
         <li><b>v1.0.0</b> · prima versione: modalità Gara ed Eliminazione, tre piste (Colazione, Scrivania, Giardino), fisica con derapata e segni di frenata, effetto miniatura, tastiera, gamepad e touch, audio sintetizzato, record del giro.</li>
       </ul>
     </details>
@@ -201,11 +240,19 @@ table.res td.t{text-align:right;font-variant-numeric:tabular-nums}
     </div>
   </div>
 </div>
+<div id="tut" class="overlay dim hidden">
+  <div class="box tut">
+    <h3>Come si gioca</h3>
+    <p class="sub">Tre cose da sapere, poi via.</p>
+    <ul id="tutList" style="margin:0;padding-left:18px;color:var(--dim);font-size:14.5px;line-height:1.5"></ul>
+    <div class="btns"><button class="pri" id="btnTut">Ho capito, si parte!</button></div>
+  </div>
+</div>
 <div id="loading" class="hidden">PREPARO LA PISTA…</div>
 
 <script>
 'use strict';
-const VERSION='1.0.0';
+const VERSION='1.1.0';
 const TAU=Math.PI*2;
 const $=s=>document.querySelector(s);
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
@@ -220,7 +267,7 @@ const hc=$('#hud'),hx=hc.getContext('2d');
 let W=0,H=0,DPR=1;
 function resize(){DPR=Math.min(window.devicePixelRatio||1,2);W=window.innerWidth;H=window.innerHeight;for(const c of [cv,hc]){c.width=Math.round(W*DPR);c.height=Math.round(H*DPR);c.style.width=W+'px';c.style.height=H+'px';}}
 window.addEventListener('resize',resize);resize();
-const viewScale=()=>clamp(Math.min(W,H)/620,0.45,1.3)*(G&&G.mode==='elim'&&G.state!=='menu'?G.squeeze:1);
+const viewScale=()=>clamp(Math.min(W,H)/620,0.45,1.3)*(G.mode==='elim'&&G.state!=='menu'?G.squeeze:G.zoom);
 
 /* ---------- tracks ---------- */
 const WORLD={w:3000,h:2000};
@@ -350,7 +397,14 @@ const THEMES={
       scatter(T,R,7,12,10,240,(x,y,r)=>mushroom(g,x,y,r,R),false);
     }}
 };
+function turnAt(T,i,len){return angDiff(T.ang[(i+len)%T.N],T.ang[i%T.N]);}
+function chevrons(g,T){const N=T.N;for(let i=0;i<N;i+=4){const tr=turnAt(T,i,22);if(Math.abs(tr)<0.8)continue;const side=-Math.sign(tr);const off=side*(T.hw+20);const p=edgePt(T,i,off);
+    if(nearLocal(T,p[0],p[1],i,80)<T.hw+8)continue;let bad=false;for(const o of T.occ){if(Math.hypot(o.x-p[0],o.y-p[1])<o.r+14){bad=true;break;}}if(bad)continue;
+    const d=Math.sign(tr);g.save();g.translate(p[0],p[1]);g.rotate(T.ang[i]+d*Math.PI/2);g.fillStyle='rgba(0,0,0,0.3)';g.fillRect(-9+2,-7+3,18,14);g.fillStyle='#e8233a';g.fillRect(-9,-7,18,14);
+    g.strokeStyle='#fff';g.lineWidth=3;g.lineJoin='miter';g.beginPath();g.moveTo(-6,-4);g.lineTo(0,0);g.lineTo(-6,4);g.moveTo(0,-4);g.lineTo(6,0);g.lineTo(0,4);g.stroke();
+    g.restore();}}
 function prerender(T){const c=document.createElement('canvas');c.width=WORLD.w;c.height=WORLD.h;const g=c.getContext('2d');T.theme.draw(g,T,mulberry(T.def.seed));
+  chevrons(g,T);
   g.strokeStyle='rgba(0,0,0,0.45)';g.lineWidth=24;g.strokeRect(0,0,WORLD.w,WORLD.h);
   T.bg=c;T.bgx=g;
   const mw=260,mh=mw*WORLD.h/WORLD.w,mc=document.createElement('canvas');mc.width=mw;mc.height=mh;const mg=mc.getContext('2d');mg.scale(mw/WORLD.w,mh/WORLD.h);strokeRoad(mg,T,T.hw*2+70,'rgba(0,0,0,0.5)');strokeRoad(mg,T,T.hw*2,'rgba(238,246,251,0.85)');T.mini=mc;}
@@ -369,10 +423,12 @@ function updateEngines(){if(!AUD.ctx)return;const t=AUD.ctx.currentTime;for(cons
 
 /* ---------- options ---------- */
 const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints||0)>0;
-const OPT={fx:store.get('gpv-mr-fx',true),audio:store.get('gpv-mr-audio',true),auto:store.get('gpv-mr-auto',isTouch)};
+const OPT={fx:store.get('gpv-mr-fx',true),audio:store.get('gpv-mr-audio',true),auto:store.get('gpv-mr-auto',isTouch),
+  diff:store.get('gpv-mr-diff','normale'),steer:store.get('gpv-mr-steer','drag'),assist:store.get('gpv-mr-assist',false),swap:store.get('gpv-mr-swap',false)};
+const DIFF={facile:{ai:0.86,rb:1.6},normale:{ai:0.95,rb:1},difficile:{ai:1.03,rb:0.45}};
 
 /* ---------- game state ---------- */
-const G={state:'menu',mode:'race',players:1,trackIdx:0,cars:[],raceTime:0,round:1,roundTime:0,roundOver:0,roundWinner:null,count:0,laps:4,win:5,cam:{x:1500,y:1000},shake:0,particles:[],resultsTimer:0,squeeze:1,msg:null,newRecord:false,time:0};
+const G={state:'menu',mode:'race',players:1,trackIdx:0,cars:[],raceTime:0,round:1,roundTime:0,roundOver:0,roundWinner:null,count:0,laps:4,win:5,cam:{x:1500,y:1000},shake:0,particles:[],resultsTimer:0,squeeze:1,zoom:1,msg:null,newRecord:false,time:0};
 let TRACK=null;
 const MAXF=420,MAXOFF=240,MAXREV=150,ACC=540,BRAKE=1000,REV=320,TURN=3.6,GRIP=10,GRIPOFF=6.5,GRIPPUD=1.5,CR=14;
 
@@ -394,7 +450,7 @@ function startGame(){
     const AI=[{c:'#ff4d5e',n:'Rosso'},{c:'#ffc93c',n:'Giallo'},{c:'#4cd97b',n:'Verde'}];
     const hs=[],ais=[];
     for(let i=0;i<humans;i++){const c=makeCar(P[i].c,P[i].n,true,i+1);c.eng=makeEngine(i?1.12:1);hs.push(c);}
-    for(let i=0;hs.length+ais.length<4;i++){const c=makeCar(AI[i].c,AI[i].n,false,0);c.ai.skill=[0.94,0.97,1.0][i];ais.push(c);}
+    for(let i=0;hs.length+ais.length<4;i++){const c=makeCar(AI[i].c,AI[i].n,false,0);c.ai.skill=[0.94,0.97,1.0][i]*DIFF[OPT.diff].ai;ais.push(c);}
     G.cars=hs.concat(ais);
     let order;
     if(G.mode==='race')order=[ais[2],ais[1],hs[0],ais[0]];
@@ -404,21 +460,42 @@ function startGame(){
     const f=focusCar();G.cam.x=f.x;G.cam.y=f.y;
     G.state='play';last=performance.now();acc=0;
     $('#menu').classList.add('hidden');$('#results').classList.add('hidden');$('#pause').classList.add('hidden');$('#loading').classList.add('hidden');
-    $('#touch').classList.toggle('hidden',!isTouch);$('#pauseBtn').classList.remove('hidden');
+    const tc=$('#touch');tc.classList.toggle('hidden',!isTouch);tc.classList.toggle('drag',isTouch&&OPT.steer==='drag');tc.classList.toggle('swap',OPT.swap);document.body.classList.toggle('swap',OPT.swap);
+    $('#pauseBtn').classList.remove('hidden');$('#restartBtn').classList.remove('hidden');
     $('#touch .gas').classList.toggle('hidden',OPT.auto);
+    TOUCH.steer=0;G.zoom=1;
+    for(const c of G.cars){c.stuckT=0;}
+    if(!store.get('gpv-mr-tut1',false))showTut();
   },30);
 }
-function toMenu(){G.state='menu';killEngines();for(const c of G.cars)c.eng=null;$('#menu').classList.remove('hidden');$('#pause').classList.add('hidden');$('#results').classList.add('hidden');$('#touch').classList.add('hidden');$('#pauseBtn').classList.add('hidden');renderTrackCards();hx.setTransform(1,0,0,1,0,0);hx.clearRect(0,0,hc.width,hc.height);}
+function showTut(){G.state='tut';const L=isTouch?[
+  (OPT.steer==='drag'?'Sterza tenendo premuto su '+(OPT.swap?'metà destra':'metà sinistra')+' dello schermo e trascinando il pollice.':'Sterza con i tasti ◀ ▶.'),
+  OPT.auto?'Il gas è automatico: premi FRENO prima delle curve strette.':'Tieni premuto GAS per accelerare, FRENO per rallentare.',
+  'In alto il copilota ti avvisa delle curve: più frecce, più devi frenare.']:[
+  'Frecce (o W A S D): su accelera, giù frena, sinistra e destra sterzano.',
+  'Frena prima delle curve strette: in alto il copilota le annuncia, più frecce = curva più stretta.',
+  'R ricomincia subito, P mette in pausa. Le pozze fanno scivolare.'];
+  $('#tutList').innerHTML=L.map(x=>'<li>'+x+'</li>').join('');$('#tut').classList.remove('hidden');}
+function hideTut(){store.set('gpv-mr-tut1',true);$('#tut').classList.add('hidden');if(G.state==='tut'){G.state='play';last=performance.now();acc=0;audioInit();}}
+function toMenu(){G.state='menu';killEngines();for(const c of G.cars)c.eng=null;$('#menu').classList.remove('hidden');$('#pause').classList.add('hidden');$('#results').classList.add('hidden');$('#touch').classList.add('hidden');$('#pauseBtn').classList.add('hidden');$('#restartBtn').classList.add('hidden');$('#tut').classList.add('hidden');renderTrackCards();hx.setTransform(1,0,0,1,0,0);hx.clearRect(0,0,hc.width,hc.height);}
 function pauseGame(){if(G.state!=='play')return;G.state='pause';$('#pauseSub').textContent=TRACKS[G.trackIdx].name+' · '+(G.mode==='race'?'Gara':'Eliminazione');$('#pause').classList.remove('hidden');}
 function resumeGame(){if(G.state!=='pause')return;$('#pause').classList.add('hidden');G.state='play';last=performance.now();acc=0;audioInit();}
 
 /* ---------- input ---------- */
 const KEYS={};
-window.addEventListener('keydown',e=>{KEYS[e.code]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)&&G.state==='play')e.preventDefault();if(e.code==='KeyP'||e.code==='Escape'){if(G.state==='play')pauseGame();else if(G.state==='pause')resumeGame();}});
+window.addEventListener('keydown',e=>{KEYS[e.code]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)&&G.state==='play')e.preventDefault();if(e.code==='KeyR'&&(G.state==='play'||G.state==='pause')){startGame();return;}
+  if(e.code==='KeyP'||e.code==='Escape'){if(G.state==='play')pauseGame();else if(G.state==='pause')resumeGame();}});
 window.addEventListener('keyup',e=>{KEYS[e.code]=false;});
 window.addEventListener('blur',()=>{for(const k in KEYS)KEYS[k]=false;if(G.state==='play')pauseGame();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&G.state==='play')pauseGame();});
-const TOUCH={left:false,right:false,gas:false,brake:false};
+const TOUCH={left:false,right:false,gas:false,brake:false,steer:0};
+(function(){const z=$('#steerZone'),k=$('#knob'),dot=k.querySelector('i');let id=null,x0=0,y0=0;
+  const set=(dx)=>{TOUCH.steer=clamp(dx/55,-1,1);dot.style.transform=`translateX(${TOUCH.steer*33}px)`;};
+  z.addEventListener('pointerdown',e=>{e.preventDefault();if(id!==null)return;id=e.pointerId;x0=e.clientX;y0=e.clientY;k.style.left=x0+'px';k.style.top=y0+'px';k.style.display='block';set(0);try{z.setPointerCapture(id);}catch(x){}});
+  z.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;set(e.clientX-x0);});
+  const end=e=>{if(e.pointerId!==id)return;id=null;set(0);k.style.display='none';};
+  z.addEventListener('pointerup',end);z.addEventListener('pointercancel',end);z.addEventListener('lostpointercapture',end);
+  z.addEventListener('contextmenu',e=>e.preventDefault());})();
 document.querySelectorAll('#touch button').forEach(b=>{const k=b.dataset.k;
   const on=e=>{e.preventDefault();TOUCH[k]=true;b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(x){}};
   const off=()=>{TOUCH[k]=false;b.classList.remove('on');};
@@ -429,13 +506,14 @@ function readPads(){PADS=[];let list=[];try{list=navigator.getGamepads?navigator
 function humanInput(c,dt){const single=G.mode==='race'||G.players===1;let t=0,b=0,s=0;const k=KEYS;
   if(c.pid===1){if(k.ArrowUp)t=1;if(k.ArrowDown)b=1;if(k.ArrowLeft)s-=1;if(k.ArrowRight)s+=1;
     if(single){if(k.KeyW)t=1;if(k.KeyS)b=1;if(k.KeyA)s-=1;if(k.KeyD)s+=1;}
-    if(isTouch){if(TOUCH.gas||(OPT.auto&&!TOUCH.brake))t=1;if(TOUCH.brake)b=1;if(TOUCH.left)s-=1;if(TOUCH.right)s+=1;}
+    if(isTouch){if(TOUCH.gas||(OPT.auto&&!TOUCH.brake))t=1;if(TOUCH.brake)b=1;if(OPT.steer==='drag')s+=TOUCH.steer;else{if(TOUCH.left)s-=1;if(TOUCH.right)s+=1;}}
     const p=PADS[0];if(p){t=Math.max(t,p.t);b=Math.max(b,p.b);s+=p.s;}}
   else{if(k.KeyW)t=1;if(k.KeyS)b=1;if(k.KeyA)s-=1;if(k.KeyD)s+=1;const p=PADS[1];if(p){t=Math.max(t,p.t);b=Math.max(b,p.b);s+=p.s;}}
   if(b>0.5&&t>0&&isTouch&&OPT.auto)t=0;
   s=clamp(s,-1,1);c.inp.t=t;c.inp.b=b;c.inp.s+=(s-c.inp.s)*Math.min(1,dt*14);}
 
 /* ---------- AI ---------- */
+function curveLimit(c){const T=TRACK,N=T.N;let limit=MAXF;for(const w of [[4,18],[10,30],[18,45]]){const a0=T.ang[(c.idx+w[0])%N],a1=T.ang[(c.idx+w[0]+w[1])%N];const cvv=Math.abs(angDiff(a1,a0));if(cvv>0.05)limit=Math.min(limit,2.6*w[1]*STEP/cvv);}return limit;}
 function aiControl(c,dt){const T=TRACK,N=T.N;const sp=Math.hypot(c.vx,c.vy);const ai=c.ai;
   ai.offT-=dt;if(ai.offT<=0){ai.offT=1.5+Math.random()*2.5;ai.offTarget=(Math.random()*2-1)*T.hw*0.45;}ai.off+=(ai.offTarget-ai.off)*Math.min(1,dt*1.2);
   if(sp<25&&ai.rev<=0&&G.count<=0){ai.stuck+=dt;if(ai.stuck>1.1){ai.rev=0.75;ai.stuck=0;}}else if(sp>=25)ai.stuck=0;
@@ -443,9 +521,7 @@ function aiControl(c,dt){const T=TRACK,N=T.N;const sp=Math.hypot(c.vx,c.vy);cons
   const tx=p[0]-Math.sin(a)*ai.off,ty=p[1]+Math.cos(a)*ai.off;
   const diff=angDiff(Math.atan2(ty-c.y,tx-c.x),c.a);
   if(ai.rev>0){ai.rev-=dt;c.inp.t=0;c.inp.b=1;c.inp.s=-Math.sign(diff);return;}
-  let limit=MAXF;
-  for(const w of [[4,18],[10,30],[18,45]]){const a0=T.ang[(c.idx+w[0])%N],a1=T.ang[(c.idx+w[0]+w[1])%N];const cvv=Math.abs(angDiff(a1,a0));if(cvv>0.05)limit=Math.min(limit,2.6*w[1]*STEP/cvv);}
-  limit*=ai.skill*ai.rb;
+  let limit=curveLimit(c)*ai.skill*ai.rb;
   let thr=1,br=0;if(sp>limit+35){thr=0;br=0.7;}else if(sp>limit){thr=0.25;}
   if(Math.abs(diff)>1.2&&sp>150){thr=0;br=0.4;}
   c.inp.t=thr;c.inp.b=br;c.inp.s=clamp(diff*2.8,-1,1);}
@@ -455,12 +531,14 @@ function puff(x,y,vx,vy,life,size,col,grow){if(G.particles.length>520)return;G.p
 function stepCar(c,dt){const T=TRACK;const fx=Math.cos(c.a),fy=Math.sin(c.a),rx=-fy,ry=fx;
   let vf=c.vx*fx+c.vy*fy,vr=c.vx*rx+c.vy*ry;const i=c.inp;
   let pud=false;for(const p of T.puddles){const dx=c.x-p.x,dy=c.y-p.y;if(dx*dx+dy*dy<p.r*p.r){pud=true;break;}}c.puddle=pud;
-  const max=(c.off?MAXOFF:MAXF)*(c.human?1:c.ai.skill*c.ai.rb);
+  const assist=c.human&&OPT.assist;
+  const max=(c.off?(assist?280:MAXOFF):MAXF)*(c.human?1:c.ai.skill*c.ai.rb);
+  if(assist&&vf>0){const lim=curveLimit(c)*1.12;if(vf>lim)vf-=Math.min(vf-lim,BRAKE*0.45*dt);}
   if(i.t>0&&vf<max)vf+=ACC*i.t*dt*(vf<0?2:1);
   if(i.b>0){if(vf>10)vf-=BRAKE*i.b*dt;else if(vf>-MAXREV)vf-=REV*i.b*dt;}
   if(vf>max)vf-=(vf-max)*3*dt;
   vf-=vf*0.35*dt;if(!(i.t>0)&&!(i.b>0))vf-=vf*0.9*dt;
-  const grip=pud?GRIPPUD:(c.off?GRIPOFF:GRIP);
+  const grip=(pud?GRIPPUD:(c.off?GRIPOFF:GRIP))*(assist?1.4:1);
   vr*=Math.exp(-grip*dt);
   const sp=Math.abs(vf);const turnF=Math.min(1,sp/110)*(1-Math.min(0.3,sp/1500));
   c.a+=i.s*TURN*turnF*(vf<0?-1:1)*dt*(pud?0.75:1);
@@ -500,7 +578,7 @@ function update(dt){
   for(const c of G.cars){if(!c.alive)continue;
     if(!racing){c.inp.t=0;c.inp.b=0;c.inp.s=0;}
     else if(c.human&&!c.finished&&!G.autopilot)humanInput(c,dt);
-    else{if(G.mode==='race'&&!c.human&&me){const d=c.prog-me.prog;const target=me.finished?1:(d>90?0.92:d<-140?1.07:1);c.ai.rb+=(target-c.ai.rb)*dt*0.5;}aiControl(c,dt);}
+    else{if(G.mode==='race'&&!c.human&&me){const d=c.prog-me.prog;const raw=me.finished?1:(d>90?0.92:d<-140?1.07:1);const target=1+(raw-1)*DIFF[OPT.diff].rb;c.ai.rb+=(target-c.ai.rb)*dt*0.5;}aiControl(c,dt);}
     stepCar(c,dt);
   }
   collide();
@@ -515,8 +593,14 @@ function update(dt){
       }
     }
   }
+  if(racing){for(const c of G.cars){if(!c.alive||c.finished&&c.human)continue;const sp=Math.hypot(c.vx,c.vy);
+    if(c.dist>TRACK.hw+28||(sp<12&&(c.inp.t>0||c.inp.b>0)))c.stuckT=(c.stuckT||0)+dt;else c.stuckT=0;
+    if(c.stuckT>(c.human?3:2.5))respawn(c);}}
   for(let i=G.particles.length-1;i>=0;i--){const p=G.particles[i];p.life-=dt;if(p.life<=0){G.particles.splice(i,1);continue;}p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=1-2*dt;p.vy*=1-2*dt;p.size+=p.grow*dt;}
-  const f=focusCar();if(f){const tx=f.x+f.vx*0.32,ty=f.y+f.vy*0.32;const k=Math.min(1,dt*(G.mode==='elim'?3.2:4.5));G.cam.x+=(tx-G.cam.x)*k;G.cam.y+=(ty-G.cam.y)*k;}
+  const f=focusCar();if(f){const sp=Math.hypot(f.vx,f.vy);const race=G.mode==='race';
+    if(race){G.zoom+=((1-0.16*clamp(sp/MAXF,0,1))-G.zoom)*Math.min(1,dt*1.5);}
+    const la=race?0.55:0.32,ha=race?Math.min(70,sp*0.18):0;
+    const tx=f.x+f.vx*la+Math.cos(f.a)*ha,ty=f.y+f.vy*la+Math.sin(f.a)*ha;const k=Math.min(1,dt*(G.mode==='elim'?3.2:4.5));G.cam.x+=(tx-G.cam.x)*k;G.cam.y+=(ty-G.cam.y)*k;}
   G.shake*=Math.pow(0.02,dt);
   if(G.msg){G.msg.t+=dt;if(G.msg.t>G.msg.dur)G.msg=null;}
   if(G.mode==='race'){if(G.cars.filter(c=>c.pid>0).every(c=>c.finished)){G.resultsTimer+=dt;if(G.resultsTimer>2.6)showResults();}}
@@ -531,9 +615,10 @@ function elimLogic(dt){
     if(al.length<=1||G.roundTime>45){const w=al.length===1?al[0]:L;w.score++;G.roundOver=2.4;G.roundWinner=w;showMsg(w.name+' VINCE IL ROUND',w.score+' / '+G.win,2.2,w.color);beep(660,0.15,'square',0.14);setTimeout(()=>beep(880,0.3,'square',0.14),150);}
   } else {G.roundOver-=dt;if(G.roundOver<=0){if(G.roundWinner.score>=G.win)showResults();else newRound();}}
 }
+function respawn(c){const T=TRACK;const j=c.idx;const a=T.ang[j];poof(c);c.x=T.S[j][0];c.y=T.S[j][1];c.a=a;c.vx=Math.cos(a)*40;c.vy=Math.sin(a)*40;c.skidPrev=null;c.stuckT=0;c.ai.rev=0;c.ai.stuck=0;if(c.human)showMsg('RIENTRO IN PISTA','',1,'#ffc93c');}
 function newRound(){const w=G.roundWinner;G.round++;const others=G.cars.filter(c=>c!==w).sort((a,b)=>b.score-a.score);placeGrid(w.idx,[w].concat(others),w.lap);G.roundTime=0;G.roundOver=0;G.squeeze=1;G.count=2.5;G.cam.x=w.x;G.cam.y=w.y;G.msg=null;}
 
-function showResults(){if(G.state!=='play')return;G.state='results';killEngines();for(const c of G.cars)c.eng=null;$('#touch').classList.add('hidden');$('#pauseBtn').classList.add('hidden');
+function showResults(){if(G.state!=='play')return;G.state='results';killEngines();for(const c of G.cars)c.eng=null;$('#touch').classList.add('hidden');$('#pauseBtn').classList.add('hidden');$('#restartBtn').classList.add('hidden');
   const tn=TRACKS[G.trackIdx].name;let html='<table class="res">';
   if(G.mode==='race'){const order=ranking();const me=G.cars.find(c=>c.pid===1);const pos=order.indexOf(me)+1;
     $('#resTitle').textContent=pos===1?'Vittoria!':pos+'° posto';$('#resSub').textContent='Gara · '+tn+' · '+G.laps+' giri';
@@ -587,6 +672,11 @@ function drawHUD(){hx.setTransform(DPR,0,0,DPR,0,0);hx.clearRect(0,0,W,H);if(G.s
   else{const n=G.cars.length,rh=20*u,pw=150*u,ph=26*u+n*rh;panel(10,10,pw,ph);hx.textAlign='left';hx.fillStyle='#93a8c9';hx.font=F(10.5);hx.fillText('ROUND '+G.round+' · A '+G.win,22,28*u);
     G.cars.forEach((c,i)=>{const y=26*u+i*rh+14*u;hx.globalAlpha=c.alive||G.count>0?1:0.4;hx.fillStyle=c.color;rr(hx,20,y-9*u,10*u,10*u,3);hx.fillStyle='#eef6fb';hx.font=F(12,600);hx.fillText(c.name,36*u,y);for(let k=0;k<G.win;k++){hx.fillStyle=k<c.score?c.color:'rgba(255,255,255,0.15)';circle(hx,92*u+k*11*u,y-4*u,4*u);}hx.globalAlpha=1;});
     const sc=viewScale();for(const c of G.cars){if(!c.alive||!c.human||G.count>0)continue;const px=(c.x-G.cam.x)*sc+W/2,py=(c.y-G.cam.y)*sc+H/2;const m=Math.min(px,W-px,py,H-py);if(m<80){const a=clamp(1-m/80,0,1)*0.55;const R=hexRgb(c.color);let gr;if(m===px)gr=hx.createLinearGradient(0,0,90,0);else if(m===W-px)gr=hx.createLinearGradient(W,0,W-90,0);else if(m===py)gr=hx.createLinearGradient(0,0,0,90);else gr=hx.createLinearGradient(0,H,0,H-90);gr.addColorStop(0,`rgba(255,60,80,${a})`);gr.addColorStop(1,'rgba(255,60,80,0)');hx.fillStyle=gr;hx.fillRect(0,0,W,H);}}}
+  const me1=G.cars.find(c=>c.pid===1);
+  if(me1&&me1.alive&&!me1.finished){let found=null;for(let k=6;k<=60;k+=2){const tr=turnAt(TRACK,me1.idx+k,22);if(Math.abs(tr)>0.6){let mx=tr;for(let q=k;q<k+24;q+=2){const t2=turnAt(TRACK,me1.idx+q,22);if(Math.abs(t2)>Math.abs(mx))mx=t2;}found={k,tr:mx};break;}}
+    if(found){const sev=Math.abs(found.tr)>1.3?3:Math.abs(found.tr)>0.95?2:1;const left=found.tr<0;const ar=(left?'‹':'›').repeat(sev);const txt=left?ar+' SINISTRA':'DESTRA '+ar;
+      const a=clamp(1.15-found.k/60,0.35,1);hx.save();hx.globalAlpha=a;hx.textAlign='center';hx.font=F(20,700);const tw=hx.measureText(txt).width+28;const cx=W/2,cy=W<560?(G.mode==='race'?118:146)*u:34*u;
+      hx.fillStyle=sev===3?'rgba(232,35,58,0.85)':sev===2?'rgba(255,170,40,0.82)':'rgba(7,10,20,0.65)';rr(hx,cx-tw/2,cy-20*u,tw,30*u,10);hx.fillStyle='#fff';hx.fillText(txt,cx,cy+2*u);hx.restore();}}
   if(G.count>0){const n=Math.min(3,Math.ceil(G.count));const cx=W/2,cy=H*0.28,r=16*u;panel(cx-r*5,cy-r*1.6,r*10,r*3.2);for(let k=0;k<3;k++){hx.fillStyle=k<4-n?'#ff3b4e':'rgba(255,255,255,0.12)';circle(hx,cx+(k-1)*r*3,cy,r);}}
   if(G.msg){const m=G.msg;const t=m.t/m.dur;const a=t<0.1?t/0.1:t>0.8?(1-t)/0.2:1;const s=1+Math.max(0,0.15-m.t)*1.5;hx.save();hx.globalAlpha=clamp(a,0,1);hx.translate(W/2,H*0.42);hx.scale(s,s);hx.textAlign='center';hx.font=F(38,700);hx.lineWidth=6;hx.strokeStyle='rgba(0,0,0,0.6)';hx.strokeText(m.text,0,0);hx.fillStyle=m.color;hx.fillText(m.text,0,0);if(m.sub){hx.font=F(16,600);hx.lineWidth=4;hx.strokeText(m.sub,0,28*u);hx.fillStyle='#eef6fb';hx.fillText(m.sub,0,28*u);}hx.restore();}
   hx.textAlign='center';hx.font=F(10,600);hx.fillStyle='rgba(238,246,251,0.45)';hx.fillText('GPverse · Micro Rush v'+VERSION,W/2,H-10-(isTouch?6:0));
@@ -609,6 +699,14 @@ G.mode=store.get('gpv-mr-mode','race');G.players=store.get('gpv-mr-players',1);G
 setSeg('#segMode',G.mode);setSeg('#segPlayers',G.players);$('#rowPlayers').classList.toggle('hidden',G.mode!=='elim');
 segWire('#segMode',v=>{G.mode=v;store.set('gpv-mr-mode',v);$('#rowPlayers').classList.toggle('hidden',v!=='elim');});
 segWire('#segPlayers',v=>{G.players=+v;store.set('gpv-mr-players',+v);});
+setSeg('#segDiff',OPT.diff);setSeg('#segSteer',OPT.steer);
+segWire('#segDiff',v=>{OPT.diff=v;store.set('gpv-mr-diff',v);if(v==='facile'&&!OPT.assist){OPT.assist=true;store.set('gpv-mr-assist',true);$('#optAssist').checked=true;}});
+segWire('#segSteer',v=>{OPT.steer=v;store.set('gpv-mr-steer',v);});
+const asEl=$('#optAssist'),swEl=$('#optSwap');asEl.checked=OPT.assist;swEl.checked=OPT.swap;
+asEl.addEventListener('change',()=>{OPT.assist=asEl.checked;store.set('gpv-mr-assist',OPT.assist);});
+swEl.addEventListener('change',()=>{OPT.swap=swEl.checked;store.set('gpv-mr-swap',OPT.swap);});
+$('#btnTut').addEventListener('click',hideTut);
+$('#restartBtn').addEventListener('click',()=>{if(G.state==='play'||G.state==='pause')startGame();});
 const fxEl=$('#optFx'),auEl=$('#optAudio'),atEl=$('#optAuto');
 fxEl.checked=OPT.fx;auEl.checked=OPT.audio;atEl.checked=OPT.auto;document.body.classList.toggle('nofx',!OPT.fx);
 fxEl.addEventListener('change',()=>{OPT.fx=fxEl.checked;store.set('gpv-mr-fx',OPT.fx);document.body.classList.toggle('nofx',!OPT.fx);});
