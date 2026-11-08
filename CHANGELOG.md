@@ -2,6 +2,10 @@
 
 Schema `V.major.minor.patch`.
 
+## v1.1.1 — 8 novembre 2026
+
+- Corretto: si passava attraverso matite, cucchiai, gomme, piatti, zollette di zucchero e funghi. Ora sono ostacoli solidi con la loro forma reale (le matite sono lunghe e sottili). Restano calpestabili solo gli oggetti piatti: post-it, graffette, foglie e fiori.
+
 ## v1.1.0 — 8 novembre 2026 (leggibilità e accessibilità)
 
 - Telecamera che guarda avanti nella direzione di marcia e si allarga un poco ad alta velocità.
