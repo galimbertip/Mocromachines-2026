@@ -2,6 +2,15 @@
 
 Schema `V.major.minor.patch`.
 
+## v1.2.0 — 8 novembre 2026 (guida e sfida)
+
+- Si cade dal tavolo: Colazione e Scrivania hanno i bordi del mobile e sotto c'è il pavimento. In Gara e Prova a tempo rientri in pista, in Eliminazione sei fuori dal round.
+- Scia: stando dietro a un'auto veloce guadagni velocità.
+- Turbo da derapata: una derapata lunga (scintille blu, poi arancioni) ricarica un turbo quando la chiudi.
+- Spintone: se butti giù dal tavolo o fuori dallo schermo un rivale appena urtato, rallentatore, bonus turbo e scritta SPINTONE!
+- Nuova modalità Prova a tempo: 5 giri da solo, auto fantasma del giro migliore, medaglie Bronzo / Argento / Oro / Autore per pista.
+- Le medaglie conquistate compaiono sulle schede delle piste.
+
 ## v1.1.1 — 8 novembre 2026
 
 - Corretto: si passava attraverso matite, cucchiai, gomme, piatti, zollette di zucchero e funghi. Ora sono ostacoli solidi con la loro forma reale (le matite sono lunghe e sottili). Restano calpestabili solo gli oggetti piatti: post-it, graffette, foglie e fiori.
