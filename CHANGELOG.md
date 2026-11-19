@@ -2,6 +2,16 @@
 
 Schema `V.major.minor.patch`.
 
+## v1.7.0 — 19 novembre 2026 (motore 3D e visuali)
+
+- Nuovo motore 3D in WebGL2 scritto a mano, senza librerie esterne: la fisica resta identica, cambia solo la grafica.
+- Tre visuali: dall'alto (la classica, unica in Eliminazione), 3/4 inclinata alla World Rally, da dietro alla Out Run. Si sceglie nel menu o in gara con il tasto V o il pulsante in alto.
+- Auto, motoscafi e Big Foot low-poly con ruote che sterzano e luci dei freni; oggetti di casa in rilievo, sponde, tunnel e giro della morte in 3D; il tavolo è sollevato dal pavimento e la caduta si vede.
+- Senso di velocità nella visuale da dietro: il campo visivo si allarga con la velocità e con il nitro.
+- Qualità automatica: sui telefoni lenti la risoluzione 3D scende da sola.
+- Se il dispositivo non supporta WebGL2 il gioco resta nella visuale dall'alto.
+- Tempo di riferimento della Vasca da bagno ricalibrato sul tracciato definitivo.
+
 ## v1.6.0 — 19 novembre 2026 (scorciatoie e cabinati anni 80/90)
 
 - Scorciatoie alla World Rally su Colazione, Scrivania, Giardino e Pista arancione: passaggi stretti segnati da paletti gialli che tagliano un pezzo di pista. Anche gli avversari a volte le prendono, più spesso in Difficile.
