@@ -2,6 +2,13 @@
 
 Schema `V.major.minor.patch`.
 
+## v1.5.0 — 19 novembre 2026 (campionato, pista del giorno, Big Foot)
+
+- Nuovo mezzo Big Foot: pick-up con ruote enormi, pesante, non teme l'erba e passa sopra gli oggetti piccoli (zollette, funghi, gessi).
+- Campionato: Coppa Casa (Colazione, Scrivania, Biliardo) e Coppa Giochi (Giardino, Spiaggia, Pista arancione), punti 10-6-3-1, classifica dopo ogni gara e premiazione finale.
+- Pista del giorno: ogni giorno una pista nuova generata dalla data, con ambiente a sorpresa; record e medaglie valgono solo per quel giorno.
+- Luci classiche: in Eliminazione a due giocatori, 4 luci a testa, chi vince il round ne ruba una, vince chi le prende tutte e 8.
+
 ## v1.4.0 — 19 novembre 2026 (pista arancione, regole extra, livree)
 
 - Avviso di curva alla World Rally: al posto della scritta, una freccia piegata quanto la curva in arrivo, colorata in base alla difficoltà.
