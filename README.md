@@ -18,7 +18,7 @@ Schema `V.major.minor.patch`. La cronologia completa è in [CHANGELOG.md](CHANGE
 
 ## Roadmap
 
-La roadmap (prossime: v1.7 motore 3D e visuali, v1.8 Gran Tour, v2.0 multiplayer ed editor) è nel documento di case study del progetto.
+La roadmap (prossime: v1.8 Gran Tour, v2.0 multiplayer ed editor) è nel documento di case study del progetto.
 
 ---
 Un progetto GPverse.
