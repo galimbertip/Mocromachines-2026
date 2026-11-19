@@ -2,6 +2,13 @@
 
 Schema `V.major.minor.patch`.
 
+## v1.4.0 — 19 novembre 2026 (pista arancione, regole extra, livree)
+
+- Avviso di curva alla World Rally: al posto della scritta, una freccia piegata quanto la curva in arrivo, colorata in base alla difficoltà.
+- Nuova pista "Pista arancione", ispirata alle piste giocattolo Hot Wheels: plastica arancione con sponde e raccordi blu, booster con le ruote che spingono, giro della morte (serve velocità, altrimenti si torna indietro) e salto nel vuoto sopra un pezzo di pista mancante.
+- Regole extra attivabili: pista ghiacciata, auto giganti, gravità lunare. Con le regole attive record e fantasmi non vengono salvati.
+- Livrea: colore e numero della tua auto; numeri anche sugli avversari.
+
 ## v1.3.0 — 19 novembre 2026 (mezzi e piste)
 
 - Quattro mezzi con guida diversa: Sportiva; Fuoristrada (non rallenta fuori pista e pesa di più negli urti); Formula 1 (velocissima e incollata alla pista, ma soffre l'erba e gli urti); A carica (scatto forte ma la molla si scarica: fermati e tieni FRENO per ricaricarla).
