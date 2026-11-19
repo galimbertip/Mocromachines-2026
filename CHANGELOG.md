@@ -2,6 +2,15 @@
 
 Schema `V.major.minor.patch`.
 
+## v1.6.0 — 19 novembre 2026 (scorciatoie e cabinati anni 80/90)
+
+- Scorciatoie alla World Rally su Colazione, Scrivania, Giardino e Pista arancione: passaggi stretti segnati da paletti gialli che tagliano un pezzo di pista. Anche gli avversari a volte le prendono, più spesso in Difficile.
+- Nitro alla Super Off Road: 2 cariche a gara (massimo 3) e bombole N2O da raccogliere in pista. Spazio per P1, Q per P2, Y/RB sul gamepad, pulsante N2O sul touch.
+- Campionato alla Super Sprint: una chiave inglese nascosta in ogni gara più una per ogni vittoria; tra una gara e l'altra l'officina migliora aderenza, accelerazione e velocità (3 livelli ciascuna). Un rivale campione (★) diventa più forte ogni volta che vinci. Con migliorie attive i record non vengono salvati.
+- Pericoli: sulla Scrivania un phon che soffia di traverso a intermittenza e un cassetto che si apre e chiude bloccando la scorciatoia.
+- Nuova pista Vasca da bagno (anche nella Coppa Casa, che diventa di 4 gare): si corre tutti in motoscafo, tra paperelle che galleggiano e il gorgo dello scarico che risucchia e fa girare.
+- Regola extra Armi giocattolo (facoltativa, alla Badlands): 3 elastici a gara che fanno girare chi colpisci. F per P1, E per P2, LB sul gamepad, pulsante 🎯 sul touch.
+
 ## v1.5.0 — 19 novembre 2026 (campionato, pista del giorno, Big Foot)
 
 - Nuovo mezzo Big Foot: pick-up con ruote enormi, pesante, non teme l'erba e passa sopra gli oggetti piccoli (zollette, funghi, gessi).
