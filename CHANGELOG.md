@@ -2,6 +2,14 @@
 
 Schema `V.major.minor.patch`.
 
+## v1.3.0 — 19 novembre 2026 (mezzi e piste)
+
+- Quattro mezzi con guida diversa: Sportiva; Fuoristrada (non rallenta fuori pista e pesa di più negli urti); Formula 1 (velocissima e incollata alla pista, ma soffre l'erba e gli urti); A carica (scatto forte ma la molla si scarica: fermati e tieni FRENO per ricaricarla).
+- Due piste nuove: Biliardo (sponde che respingono, sei buche in cui cadere, palle da spingere) e Biglie in spiaggia (pista nella sabbia con sponde, gallerie e biglie giganti che rotolano lungo il percorso).
+- Pericoli che si muovono: arancia che rotola sulla Colazione, pallina di carta sulla Scrivania, robot tosaerba che attraversa il Giardino.
+- Rampe: libri e assi di legno fanno saltare le auto; in volo si passa sopra ostacoli e buche.
+- Record, fantasma e medaglie separati per mezzo, con tempi obiettivo adattati.
+
 ## v1.2.0 — 8 novembre 2026 (guida e sfida)
 
 - Si cade dal tavolo: Colazione e Scrivania hanno i bordi del mobile e sotto c'è il pavimento. In Gara e Prova a tempo rientri in pista, in Eliminazione sei fuori dal round.
